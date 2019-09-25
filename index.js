@@ -21,11 +21,11 @@ class GrpcServer {
     this.server = new grpc.Server();
   }
 
-  use({ protoPath, packageName, serviceName, routes, options }){
+  use({ protoPath, packageName, serviceName, routes, options, beforeCall, afterCall  }){
     const pkgDef = grpc.loadPackageDefinition(protoLoader.loadSync(protoPath, options));
     const proto = getProtoFromPackageDefinition(pkgDef, packageName);
     const router = Object.entries(routes).reduce((_router, [action, handler]) => {
-      _router[action] = handleWhetherAsyncOrNot(handler);
+      _router[action] = handleWhetherAsyncOrNot(handler, beforeCall, afterCall);
       return _router;
     }, {});
     this.server.addService(proto[serviceName].service, router);
@@ -48,15 +48,25 @@ class GrpcServer {
   }
 }
 
-function handleWhetherAsyncOrNot(handler){
-  return (call, callback) => {
-    const mightBePromise = handler(call, callback);
-    if(mightBePromise && mightBePromise.then && mightBePromise.catch){
-      return mightBePromise
-        .then((result) => callback(null, result))
-        .catch((err) => callback(err));
+function handleWhetherAsyncOrNot(handler, beforeCall, afterCall) {
+  return async (call, callback) => {
+    try{
+      if(typeof beforeCall === 'function') {
+        await beforeCall(call);
+      };
+      
+      const mightBePromise = await handler(call, callback);
+      
+      if(typeof afterCall === 'function') {
+        await afterCall()
+       };
+
+      return callback(null, mightBePromise);
+    } catch(err){
+
+      return callback(err);
     }
-  }
+  };
 }
 
 exports.createClient = createClient;
