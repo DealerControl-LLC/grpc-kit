@@ -25,7 +25,7 @@ class GrpcServer {
     const pkgDef = grpc.loadPackageDefinition(protoLoader.loadSync(protoPath, options));
     const proto = getProtoFromPackageDefinition(pkgDef, packageName);
     const router = Object.entries(routes).reduce((_router, [action, handler]) => {
-      _router[action] = handleWhetherAsyncOrNot(handler, beforeCall, afterCall);
+			_router[action] = handleWhetherAsyncOrNot(handler, {beforeCall, afterCall, serviceName, action});
       return _router;
     }, {});
     this.server.addService(proto[serviceName].service, router);
@@ -48,17 +48,17 @@ class GrpcServer {
   }
 }
 
-function handleWhetherAsyncOrNot(handler, beforeCall, afterCall) {
+function handleWhetherAsyncOrNot(handler, {beforeCall, afterCall, serviceName, action}) {
   return async (call, callback) => {
     try{
       if(typeof beforeCall === 'function') {
-        await beforeCall(call);
+        await beforeCall(call, serviceName, action);
       };
       
       const response = await handler(call, callback);
       
       if(typeof afterCall === 'function') {
-        await afterCall(call, response)
+        await afterCall(call, response, serviceName, action)
        };
 
       return callback(null, response);

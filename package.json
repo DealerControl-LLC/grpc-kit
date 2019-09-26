@@ -1,6 +1,6 @@
 {
-  "name": "grpc-kit",
-  "version": "0.2.0",
+  "name": "@dealercontrol/grpc-kit",
+  "version": "0.2.4",
   "description": "use grpc more simply",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/YoshiyukiKato/grpc-kit.git"
+    "url": "git+https://github.com/DealerControl-LLC/grpc-kit.git"
   },
   "keywords": [
     "grpc"
@@ -16,9 +16,9 @@
   "author": "YoshiyukiKato",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/YoshiyukiKato/grpc-kit/issues"
+    "url": "https://github.com/DealerControl-LLC/grpc-kit/issues"
   },
-  "homepage": "https://github.com/YoshiyukiKato/grpc-kit#readme",
+  "homepage": "https://github.com/DealerControl-LLC/grpc-kit#readme",
   "peerDependencies": {
     "grpc": "^1.17.0",
     "@grpc/proto-loader": "^0.3.0"
@@ -29,5 +29,9 @@
     "grpc": "^1.17.0",
     "intelli-espower-loader": "^1.0.1",
     "mocha": "^5.2.0"
+  },
+  "directories": {
+    "example": "example",
+    "test": "test"
   }
 }
