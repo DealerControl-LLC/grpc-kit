@@ -51,19 +51,35 @@ class GrpcServer {
 function handleWhetherAsyncOrNot(handler, {beforeCall, afterCall, serviceName, action}) {
   return async (call, callback) => {
     try{
-      if(typeof beforeCall === 'function') {
+      if(Array.isArray(beforeCall)){
+        for(i = 0; i <= beforeCall.length; i++){
+          let cb = beforeCall[i];
+          if(typeof cb !== 'function'){
+            continue;
+          }
+          await cb(call, serviceName, action);
+        }
+      } else
+      if(typeof beforeCall === 'function'){
         await beforeCall(call, serviceName, action);
-      };
-      
+      }
       const response = await handler(call, callback);
       
-      if(typeof afterCall === 'function') {
-        await afterCall(call, response, serviceName, action)
-       };
+      if(Array.isArray(afterCall)){
+        for(i = 0; i <= afterCall.length; i++){
+          let cb = afterCall[i];
+          if(typeof cb !== 'function'){
+            continue;
+          }
+          await cb(call, response, serviceName, action);
+        }
+      } else
+      if(typeof afterCall === 'function'){
+        await afterCall(call, response, serviceName, action);
+      }
 
       return callback(null, response);
     } catch(err){
-
       return callback(err);
     }
   };
