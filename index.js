@@ -55,13 +55,13 @@ function handleWhetherAsyncOrNot(handler, beforeCall, afterCall) {
         await beforeCall(call);
       };
       
-      const mightBePromise = await handler(call, callback);
+      const response = await handler(call, callback);
       
       if(typeof afterCall === 'function') {
-        await afterCall()
+        await afterCall(call, response)
        };
 
-      return callback(null, mightBePromise);
+      return callback(null, response);
     } catch(err){
 
       return callback(err);
